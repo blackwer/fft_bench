@@ -1,0 +1,4 @@
+/build
+/setenv.sh
+/compile_commands.json
+/.cache
