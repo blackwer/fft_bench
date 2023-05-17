@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(
   fft_bench
-  LANGUAGES CXX
+  LANGUAGES C CXX
 )
 
 set(CMAKE_CXX_STANDARD 17)
@@ -36,3 +36,8 @@ add_executable(fftw3_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
 target_include_directories(fftw3_bench PRIVATE ${FFT_BENCH_INCLUDES} ${FFTW3_INCLUDE_DIRS})
 target_link_libraries(fftw3_bench ${FFTW3_LIBRARIES}  benchmark::benchmark)
 target_compile_options(fftw3_bench PRIVATE -march=native -DFFT_BENCH_FFTW3)
+
+add_executable(pocket_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp ${PROJECT_SOURCE_DIR}/extern/pocketfft/pocketfft.c)
+target_include_directories(pocket_bench PRIVATE ${FFT_BENCH_INCLUDES} ${PROJECT_SOURCE_DIR}/extern/pocketfft)
+target_link_libraries(pocket_bench benchmark::benchmark)
+target_compile_options(pocket_bench PRIVATE -march=native -DFFT_BENCH_POCKET)
