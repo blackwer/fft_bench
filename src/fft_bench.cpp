@@ -11,7 +11,7 @@
 #else
 #endif
 
-template <int N, int STRATEGY=FFTW_ESTIMATE>
+template <int N, int STRATEGY=FFTW_MEASURE>
 static void run_1d_fft(benchmark::State &state) {
     std::random_device rand_dev;
     std::mt19937 generator(rand_dev());

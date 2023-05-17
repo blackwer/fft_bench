@@ -4,3 +4,6 @@
 [submodule "extern/kissfft"]
 	path = extern/kissfft
 	url = https://github.com/mborgerding/kissfft
+[submodule "extern/benchmark"]
+	path = extern/benchmark
+	url = https://github.com/google/benchmark
