@@ -13,6 +13,9 @@ extern "C" {
 #include <pocketfft.h>
 }
 #define FFTW_MEASURE 0
+#elif FFT_BENCH_KISS
+#include <kiss_fft.h>
+#define FFTW_MEASURE 0
 #endif
 
 void initialize_arrays(int N, double *in, double *out) {
@@ -55,6 +58,19 @@ static void run_1d_fft(benchmark::State &state) {
 
     destroy_cfft_plan(p);
 }
+#elif defined(FFT_BENCH_KISS)
+template <int N, int STRATEGY=FFTW_MEASURE>
+static void run_1d_fft(benchmark::State &state) {
+    kiss_fft_cpx *in = (kiss_fft_cpx *)malloc(sizeof(kiss_fft_cpx) * N);
+    kiss_fft_cpx *out = (kiss_fft_cpx *)malloc(sizeof(kiss_fft_cpx) * N);
+    initialize_arrays(N, (double*)in, (double*)out);
+    kiss_fft_cfg p = kiss_fft_alloc(N, 0, NULL, NULL);
+
+    for (auto _ : state)
+        kiss_fft(p, in, out);
+
+    kiss_fft_free(p);
+}
 #endif
 
 
@@ -66,5 +82,10 @@ BENCHMARK(run_1d_fft<1024 << 4>);
 BENCHMARK(run_1d_fft<1024 << 5>);
 BENCHMARK(run_1d_fft<1024 << 6>);
 BENCHMARK(run_1d_fft<1024 << 7>);
+BENCHMARK(run_1d_fft<1024 << 8>);
+BENCHMARK(run_1d_fft<1024 << 9>);
+BENCHMARK(run_1d_fft<1024 << 10>);
+BENCHMARK(run_1d_fft<1024 << 11>);
+BENCHMARK(run_1d_fft<1024 << 12>);
 
 BENCHMARK_MAIN();

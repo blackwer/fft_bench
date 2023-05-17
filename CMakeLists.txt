@@ -27,6 +27,9 @@ find_program(MAKE_EXECUTABLE NAMES make REQUIRED)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/extern/benchmark)
 
+set(KISSFFT_DATATYPE double CACHE STRING "" FORCE)
+add_subdirectory(${PROJECT_SOURCE_DIR}/extern/kissfft)
+
 add_executable(mkl_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
 target_include_directories(mkl_bench PRIVATE ${FFT_BENCH_INCLUDES} ${MKL_H})
 target_link_libraries(mkl_bench mkl_rt benchmark::benchmark)
@@ -41,3 +44,8 @@ add_executable(pocket_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp ${PROJECT_SO
 target_include_directories(pocket_bench PRIVATE ${FFT_BENCH_INCLUDES} ${PROJECT_SOURCE_DIR}/extern/pocketfft)
 target_link_libraries(pocket_bench benchmark::benchmark)
 target_compile_options(pocket_bench PRIVATE -march=native -DFFT_BENCH_POCKET)
+
+add_executable(kiss_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
+target_include_directories(kiss_bench PRIVATE ${FFT_BENCH_INCLUDES})
+target_link_libraries(kiss_bench benchmark::benchmark kissfft::kissfft)
+target_compile_options(kiss_bench PRIVATE -march=native -DFFT_BENCH_KISS)
