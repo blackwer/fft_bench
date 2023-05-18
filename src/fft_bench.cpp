@@ -34,11 +34,16 @@ void initialize_arrays(int N, double *in, double *out) {
 }
 
 #if defined(FFT_BENCH_MKL) | defined(FFT_BENCH_FFTW3)
-template <int N, int STRATEGY = FFTW_MEASURE>
-static void run_1d_fft(benchmark::State &state) {
+template <int N_per_dim, int dim >
+static void run_fft(benchmark::State &state) {
+    constexpr int N = std::pow(N_per_dim, dim);
     fftw_complex *in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * N);
     fftw_complex *out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * N);
     initialize_arrays(N, (double *)in, (double *)out);
+
+    int n[dim];
+    for (int i = 0; i < dim; ++i)
+        n[i] = N_per_dim;
 
 #ifdef FFT_BENCH_OMP
     int n_threads;
@@ -46,7 +51,7 @@ static void run_1d_fft(benchmark::State &state) {
     n_threads = omp_get_num_threads();
     fftw_plan_with_nthreads(n_threads);
 #endif
-    fftw_plan p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, STRATEGY);
+    fftw_plan p = fftw_plan_dft(dim, n, in, out, FFTW_FORWARD, FFTW_MEASURE);
 
     for (auto _ : state)
         fftw_execute(p);
@@ -57,8 +62,9 @@ static void run_1d_fft(benchmark::State &state) {
 }
 
 #elif defined(FFT_BENCH_POCKET)
-template <int N>
-static void run_1d_fft(benchmark::State &state) {
+template <int N, int dim >
+static void run_fft(benchmark::State &state) {
+    static_assert(dim == 1, "Multiple dimensions not implemented for pocket");
     double *in = (double *)malloc(2 * sizeof(double) * N);
     double *out = (double *)malloc(2 * sizeof(double) * N);
     initialize_arrays(N, in, out);
@@ -70,8 +76,9 @@ static void run_1d_fft(benchmark::State &state) {
     destroy_cfft_plan(p);
 }
 #elif defined(FFT_BENCH_KISS)
-template <int N>
-static void run_1d_fft(benchmark::State &state) {
+template <int N, int dim = 1>
+static void run_fft(benchmark::State &state) {
+    static_assert(dim == 1, "Multiple dimensions not implemented for KISS");
     kiss_fft_cpx *in = (kiss_fft_cpx *)malloc(sizeof(kiss_fft_cpx) * N);
     kiss_fft_cpx *out = (kiss_fft_cpx *)malloc(sizeof(kiss_fft_cpx) * N);
     initialize_arrays(N, (double *)in, (double *)out);
@@ -84,24 +91,44 @@ static void run_1d_fft(benchmark::State &state) {
 }
 #endif
 
-BENCHMARK(run_1d_fft<1 << 8>);
-BENCHMARK(run_1d_fft<1 << 9>);
-BENCHMARK(run_1d_fft<1 << 10>);
-BENCHMARK(run_1d_fft<1 << 11>);
-BENCHMARK(run_1d_fft<1 << 12>);
-BENCHMARK(run_1d_fft<1 << 13>);
-BENCHMARK(run_1d_fft<1 << 14>);
-BENCHMARK(run_1d_fft<1 << 15>);
-BENCHMARK(run_1d_fft<1 << 16>);
-BENCHMARK(run_1d_fft<1 << 17>);
-BENCHMARK(run_1d_fft<1 << 18>);
-BENCHMARK(run_1d_fft<1 << 19>);
-BENCHMARK(run_1d_fft<1 << 20>);
-BENCHMARK(run_1d_fft<1 << 21>);
-BENCHMARK(run_1d_fft<1 << 22>);
-BENCHMARK(run_1d_fft<1 << 23>);
-BENCHMARK(run_1d_fft<1 << 24>);
-BENCHMARK(run_1d_fft<1 << 25>);
+BENCHMARK(run_fft<1 << 8, 1>);
+BENCHMARK(run_fft<1 << 9, 1>);
+BENCHMARK(run_fft<1 << 10, 1>);
+BENCHMARK(run_fft<1 << 11, 1>);
+BENCHMARK(run_fft<1 << 12, 1>);
+BENCHMARK(run_fft<1 << 13, 1>);
+BENCHMARK(run_fft<1 << 14, 1>);
+BENCHMARK(run_fft<1 << 15, 1>);
+BENCHMARK(run_fft<1 << 16, 1>);
+BENCHMARK(run_fft<1 << 17, 1>);
+BENCHMARK(run_fft<1 << 18, 1>);
+BENCHMARK(run_fft<1 << 19, 1>);
+BENCHMARK(run_fft<1 << 20, 1>);
+BENCHMARK(run_fft<1 << 21, 1>);
+BENCHMARK(run_fft<1 << 22, 1>);
+BENCHMARK(run_fft<1 << 23, 1>);
+BENCHMARK(run_fft<1 << 24, 1>);
+BENCHMARK(run_fft<1 << 25, 1>);
 
+#if defined(FFT_BENCH_MKL) | defined(FFT_BENCH_FFTW3)
+BENCHMARK(run_fft<1 << 4, 2>);
+BENCHMARK(run_fft<1 << 5, 2>);
+BENCHMARK(run_fft<1 << 6, 2>);
+BENCHMARK(run_fft<1 << 7, 2>);
+BENCHMARK(run_fft<1 << 8, 2>);
+BENCHMARK(run_fft<1 << 9, 2>);
+BENCHMARK(run_fft<1 << 10, 2>);
+BENCHMARK(run_fft<1 << 11, 2>);
+BENCHMARK(run_fft<1 << 12, 2>);
+BENCHMARK(run_fft<1 << 13, 2>);
+
+BENCHMARK(run_fft<1 << 2, 3>);
+BENCHMARK(run_fft<1 << 3, 3>);
+BENCHMARK(run_fft<1 << 5, 3>);
+BENCHMARK(run_fft<1 << 6, 3>);
+BENCHMARK(run_fft<1 << 7, 3>);
+BENCHMARK(run_fft<1 << 8, 3>);
+BENCHMARK(run_fft<1 << 9, 3>);
+#endif
 
 BENCHMARK_MAIN();

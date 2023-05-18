@@ -1,9 +1,10 @@
+#!/usr/bin/env python3
+
 import json
 import re
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import numpy as np
 
 mpl.use('cairo')
 
@@ -23,7 +24,7 @@ cpu_data = {
     'skylake': 'Intel Xeon Gold 6148',
 }
 
-def get_run_size(name: str):
+def get_run_params(name: str):
     return eval(re.findall(r'\<.*?\>', name)[0].strip('<>'))
 
 aggregate_data = {}
@@ -34,43 +35,54 @@ for arch in arches:
             data = json.load(f)
 
         n_runs = len(data['benchmarks'])
-        sizes = np.empty(n_runs)
-        timings = np.empty(n_runs)
+        params = []
         for i, run in enumerate(data['benchmarks']):
-            sizes[i] = get_run_size(run['name'])
-            timings[i] = run['real_time']
+            # N_per_dim, dim, timing
+            params.append((*get_run_params(run['name']), run['real_time']))
 
-        aggregate_data[arch][implementation] = dict(
-            sizes=sizes,
-            timings=timings,
-        )
+        aggregate_data[arch][implementation] = params
 
-        
-for arch in arches:
-    fig, ax = plt.subplots(1, figsize=(12, 8))
-    for impl, meas in aggregate_data[arch].items():
-        if '-omp' in impl:
-            continue
-        plt.loglog(meas['sizes'], meas['timings'], label=impl, linewidth=3)
-    plt.title(f"1D C2C on {cpu_data[arch]} (single-threaded)", fontdict=mainfont)
-    plt.xlabel("FFT size", fontdict=mainfont)
-    plt.ylabel("Time (µs)", fontdict=mainfont)
-    ax.tick_params(labelsize=14, width=2)
+def plot_st_dim(dim: int):
+    for arch in arches:
+        _, ax = plt.subplots(1, figsize=(12, 8))
+        for impl, meas in aggregate_data[arch].items():
+            if '-omp' in impl:
+                continue
+            params = list(zip(*filter(lambda param: param[1] == dim, meas)))
+            if not params:
+                continue
+            sizes, _, timings = params
+            if len(sizes):
+                plt.loglog(sizes, timings, label=impl, linewidth=3)
+        plt.title(f"{dim}D C2C on {cpu_data[arch]} (single-threaded)", fontdict=mainfont)
+        plt.xlabel("FFT size", fontdict=mainfont)
+        plt.ylabel("Time (µs)", fontdict=mainfont)
+        ax.tick_params(labelsize=14, width=2)
 
-    plt.legend(prop={'size':18})
-    plt.savefig(f'1d_c2c_st_{arch}.png', )
+        plt.legend(prop={'size':18})
+        plt.savefig(f'{dim}d_c2c_st_{arch}.png', )
+
+def plot_mt_dim(dim: int):
+    for arch in arches:
+        _, ax = plt.subplots(1, figsize=(12, 8))
+        for impl, meas in aggregate_data[arch].items():
+            if '-omp' not in impl:
+                continue
+            params = list(zip(*filter(lambda param: param[1] == dim, meas)))
+            if not params:
+                continue
+            sizes, _, timings = params
+            if len(sizes):
+                plt.loglog(sizes, timings, label=impl, linewidth=3)
+        plt.title(f"{dim}D C2C on {cpu_data[arch]} (multi-threaded)", fontdict=mainfont)
+        plt.xlabel("FFT size", fontdict=mainfont)
+        plt.ylabel("Time (µs)", fontdict=mainfont)
+        ax.tick_params(labelsize=14, width=2)
+
+        plt.legend(prop={'size':18})
+        plt.savefig(f'{dim}d_c2c_mt_{arch}.png', )
 
 
-for arch in arches:
-    fig, ax = plt.subplots(1, figsize=(12, 8))
-    for impl, meas in aggregate_data[arch].items():
-        if '-omp' not in impl:
-            continue
-        plt.loglog(meas['sizes'], meas['timings'], label=impl, linewidth=3)
-    plt.title(f"1D C2C on {cpu_data[arch]} (multi-threaded)", fontdict=mainfont)
-    plt.xlabel("FFT size", fontdict=mainfont)
-    plt.ylabel("Time (µs)", fontdict=mainfont)
-    ax.tick_params(labelsize=14, width=2)
-
-    plt.legend(prop={'size':18})
-    plt.savefig(f'1d_c2c_mt_{arch}.png', )
+for dim in range(1, 4):
+    plot_st_dim(dim)
+    plot_mt_dim(dim)
