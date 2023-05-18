@@ -21,6 +21,7 @@ set(
 
 find_package(PkgConfig REQUIRED)
 find_package(MKL REQUIRED)
+find_package(OpenMP REQUIRED)
 pkg_check_modules(FFTW3 REQUIRED fftw3)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/extern/benchmark)
@@ -38,10 +39,20 @@ target_include_directories(mkl_bench PRIVATE ${FFT_BENCH_INCLUDES} ${MKL_H})
 target_link_libraries(mkl_bench mkl_rt benchmark::benchmark)
 target_compile_options(mkl_bench PRIVATE -march=native -DFFT_BENCH_MKL)
 
+add_executable(mkl_omp_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
+target_include_directories(mkl_omp_bench PRIVATE ${FFT_BENCH_INCLUDES} ${FFTW3_INCLUDE_DIRS})
+target_link_libraries(mkl_omp_bench mkl_rt OpenMP::OpenMP_CXX benchmark::benchmark)
+target_compile_options(mkl_omp_bench PRIVATE -march=native -DFFT_BENCH_MKL -DFFT_BENCH_OMP)
+
 add_executable(fftw3_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
 target_include_directories(fftw3_bench PRIVATE ${FFT_BENCH_INCLUDES} ${FFTW3_INCLUDE_DIRS})
-target_link_libraries(fftw3_bench ${FFTW3_LIBRARIES}  benchmark::benchmark)
+target_link_libraries(fftw3_bench ${FFTW3_LIBRARIES} benchmark::benchmark)
 target_compile_options(fftw3_bench PRIVATE -march=native -DFFT_BENCH_FFTW3)
+
+add_executable(fftw3_omp_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
+target_include_directories(fftw3_omp_bench PRIVATE ${FFT_BENCH_INCLUDES} ${FFTW3_INCLUDE_DIRS})
+target_link_libraries(fftw3_omp_bench ${FFTW3_LIBRARIES} ${FFTW3_LIBDIR}/libfftw3_omp.so  OpenMP::OpenMP_CXX benchmark::benchmark)
+target_compile_options(fftw3_omp_bench PRIVATE -march=native -DFFT_BENCH_FFTW3 -DFFT_BENCH_OMP)
 
 add_executable(pocket_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp ${PROJECT_SOURCE_DIR}/extern/pocketfft/pocketfft.c)
 target_include_directories(pocket_bench PRIVATE ${FFT_BENCH_INCLUDES} ${PROJECT_SOURCE_DIR}/extern/pocketfft)

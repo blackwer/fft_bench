@@ -12,6 +12,12 @@ module list
 
 FFT_BENCH_PATH=$HOME/projects/codes/fft_bench/build
 
+export OMP_NUM_THREADS=20
+export OMP_PROC_BIND=spread
+export OMP_PLACES=threads
+taskset -c 0-19 $FFT_BENCH_PATH/mkl_omp_bench --benchmark_out=mkl-omp-skylake.json --benchmark_out_format=json --benchmark_time_unit=us
+taskset -c 0-19 $FFT_BENCH_PATH/fftw3_omp_bench --benchmark_out=fftw3-omp-skylake.json --benchmark_out_format=json --benchmark_time_unit=us
+
 taskset -c 0 $FFT_BENCH_PATH/mkl_bench --benchmark_out=mkl-skylake.json --benchmark_out_format=json --benchmark_time_unit=us
 taskset -c 0 $FFT_BENCH_PATH/fftw3_bench --benchmark_out=fftw3-skylake.json --benchmark_out_format=json --benchmark_time_unit=us
 taskset -c 0 $FFT_BENCH_PATH/pocket_bench --benchmark_out=pocket-skylake.json --benchmark_out_format=json --benchmark_time_unit=us

@@ -15,7 +15,7 @@ mainfont = {
 }
 
 arches = ['rome', 'skylake', 'icelake']
-implementations = ['mkl', 'fftw3', 'pocket', 'kiss']
+implementations = ['mkl', 'fftw3', 'mkl-omp', 'fftw3-omp', 'pocket', 'kiss']
 
 cpu_data = {
     'rome': 'AMD EPYC 7742',
@@ -49,6 +49,8 @@ for arch in arches:
 for arch in arches:
     fig, ax = plt.subplots(1, figsize=(12, 8))
     for impl, meas in aggregate_data[arch].items():
+        if '-omp' in impl:
+            continue
         plt.loglog(meas['sizes'], meas['timings'], label=impl, linewidth=3)
     plt.title(f"1D C2C on {cpu_data[arch]} (single-threaded)", fontdict=mainfont)
     plt.xlabel("FFT size", fontdict=mainfont)
@@ -57,3 +59,18 @@ for arch in arches:
 
     plt.legend(prop={'size':18})
     plt.savefig(f'1d_c2c_st_{arch}.png', )
+
+
+for arch in arches:
+    fig, ax = plt.subplots(1, figsize=(12, 8))
+    for impl, meas in aggregate_data[arch].items():
+        if '-omp' not in impl:
+            continue
+        plt.loglog(meas['sizes'], meas['timings'], label=impl, linewidth=3)
+    plt.title(f"1D C2C on {cpu_data[arch]} (multi-threaded)", fontdict=mainfont)
+    plt.xlabel("FFT size", fontdict=mainfont)
+    plt.ylabel("Time (µs)", fontdict=mainfont)
+    ax.tick_params(labelsize=14, width=2)
+
+    plt.legend(prop={'size':18})
+    plt.savefig(f'1d_c2c_mt_{arch}.png', )

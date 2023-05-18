@@ -4,6 +4,10 @@
 
 #include <benchmark/benchmark.h>
 
+#ifdef FFT_BENCH_OMP
+#include <omp.h>
+#endif
+
 #ifdef FFT_BENCH_MKL
 #include <fftw/fftw3_mkl.h>
 #elif FFT_BENCH_FFTW3
@@ -35,6 +39,13 @@ static void run_1d_fft(benchmark::State &state) {
     fftw_complex *in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * N);
     fftw_complex *out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * N);
     initialize_arrays(N, (double *)in, (double *)out);
+
+#ifdef FFT_BENCH_OMP
+    int n_threads;
+#pragma omp parallel
+    n_threads = omp_get_num_threads();
+    fftw_plan_with_nthreads(n_threads);
+#endif
     fftw_plan p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, STRATEGY);
 
     for (auto _ : state)
@@ -46,7 +57,7 @@ static void run_1d_fft(benchmark::State &state) {
 }
 
 #elif defined(FFT_BENCH_POCKET)
-template <int N, int STRATEGY = FFTW_MEASURE>
+template <int N>
 static void run_1d_fft(benchmark::State &state) {
     double *in = (double *)malloc(2 * sizeof(double) * N);
     double *out = (double *)malloc(2 * sizeof(double) * N);
@@ -59,7 +70,7 @@ static void run_1d_fft(benchmark::State &state) {
     destroy_cfft_plan(p);
 }
 #elif defined(FFT_BENCH_KISS)
-template <int N, int STRATEGY = FFTW_MEASURE>
+template <int N>
 static void run_1d_fft(benchmark::State &state) {
     kiss_fft_cpx *in = (kiss_fft_cpx *)malloc(sizeof(kiss_fft_cpx) * N);
     kiss_fft_cpx *out = (kiss_fft_cpx *)malloc(sizeof(kiss_fft_cpx) * N);
