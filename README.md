@@ -1,11 +1,11 @@
 # Benchmarking various FFT implementations
 FFTW3 run in FFTW_MEASURE mode. FFTW_PATIENT is death, and I wanted to give it a fair shot with the default. It's compiled with
 ```
-./configure --enable-openmp --enable-shared=yes  --enable-sse2 --enable-avx  --enable-avx2 --enable-avx512 --enable-fma \
-    --disable-kcvi --disable-vsx --disable-avx-128-fma --enable-fma
+./configure --enable-openmp --enable-shared=yes --enable-sse2 --enable-avx\
+    --enable-avx2 --enable-avx512 --disable-kcvi --disable-vsx \
+    --disable-avx-128-fma --enable-fma
 ```
-All benchmarks are run compiled with native instructions enabled `-march=native -O3`
-
+using `gcc 12.2.0`. All benchmarks are compiled with native instructions enabled: `-march=native -O3`
 
 ## Single threaded results
 ![](fi/1d_c2c_st_rome.png)
