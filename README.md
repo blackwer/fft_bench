@@ -7,6 +7,11 @@ FFTW3 run in FFTW_MEASURE mode. FFTW_PATIENT is death, and I wanted to give it a
 ```
 using `gcc 12.2.0`. All benchmarks are compiled with native instructions enabled: `-march=native -O3`
 
+| MKL      | FFTW   | KISS    | Pocket   |
+|----------|--------|---------|----------|
+| 2023.0.0 | 3.3.10 | 131.1.0 | 81d171a6 |
+
+
 ## Single threaded results
 ### 1D
 ![](fi/1d_c2c_st_rome.png)
