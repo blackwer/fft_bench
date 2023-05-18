@@ -3,12 +3,7 @@ project(
   fft_bench
   LANGUAGES C CXX
 )
-
 set(CMAKE_CXX_STANDARD 17)
-find_package(PkgConfig REQUIRED)
-find_package(MKL REQUIRED)
-
-pkg_check_modules(FFTW3 REQUIRED fftw3)
 
 set (default_build_type "Release")
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -23,12 +18,20 @@ set(
   ${PROJECT_SOURCE_DIR}/include
 )
 
-find_program(MAKE_EXECUTABLE NAMES make REQUIRED)
+
+find_package(PkgConfig REQUIRED)
+find_package(MKL REQUIRED)
+pkg_check_modules(FFTW3 REQUIRED fftw3)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/extern/benchmark)
 
+set(KISSFFT_STATIC ON CACHE STRING "" FORCE)
+set(KISSFFT_PKGCONFIG ON CACHE STRING "" FORCE)
+set(KISSFFT_TOOLS OFF CACHE STRING "" FORCE)
+set(KISSFFT_TEST OFF CACHE STRING "" FORCE)
 set(KISSFFT_DATATYPE double CACHE STRING "" FORCE)
 add_subdirectory(${PROJECT_SOURCE_DIR}/extern/kissfft)
+
 
 add_executable(mkl_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
 target_include_directories(mkl_bench PRIVATE ${FFT_BENCH_INCLUDES} ${MKL_H})
