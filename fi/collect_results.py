@@ -5,7 +5,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
-mpl.use('TKAgg')
+mpl.use('cairo')
 
 mainfont = {
     'family': 'sans-serif',
@@ -14,8 +14,8 @@ mainfont = {
     'size': 18,
 }
 
-def get_run_size(name: str):
-    return eval(re.findall(r'\<.*?\>', name)[0].strip('<>'))
+arches = ['rome', 'skylake', 'icelake']
+implementations = ['mkl', 'fftw3', 'pocket', 'kiss']
 
 cpu_data = {
     'rome': 'AMD EPYC 7742',
@@ -23,8 +23,8 @@ cpu_data = {
     'skylake': 'Intel Xeon Gold 6148',
 }
 
-arches = ['rome', 'skylake', 'icelake']
-implementations = ['mkl', 'fftw3', 'pocket', 'kiss']
+def get_run_size(name: str):
+    return eval(re.findall(r'\<.*?\>', name)[0].strip('<>'))
 
 aggregate_data = {}
 for arch in arches:
