@@ -47,6 +47,9 @@ Note that KISS has openmp enabled, but I didn't do a separate build for it. Give
 ![](fi/1d_c2c_mt_icelake.png)
 
 ### 2D
+Note the AMD measurements are not in error. This really happens consistently. MKL is very
+unhappy with more than 16 threads for these particular sizes in 2D.
+
 ![](fi/2d_c2c_mt_rome.png)
 ![](fi/2d_c2c_mt_skylake.png)
 ![](fi/2d_c2c_mt_icelake.png)
