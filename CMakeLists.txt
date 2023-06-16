@@ -63,3 +63,8 @@ add_executable(kiss_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
 target_include_directories(kiss_bench PRIVATE ${FFT_BENCH_INCLUDES})
 target_link_libraries(kiss_bench benchmark::benchmark kissfft::kissfft)
 target_compile_options(kiss_bench PRIVATE -march=native -DFFT_BENCH_KISS)
+
+add_executable(ducc_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
+target_include_directories(ducc_bench PRIVATE ${FFT_BENCH_INCLUDES} ${PROJECT_SOURCE_DIR}/extern/ducc0/src)
+target_link_libraries(ducc_bench benchmark::benchmark)
+target_compile_options(ducc_bench PRIVATE -march=native -DFFT_BENCH_DUCC)
