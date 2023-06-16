@@ -23,4 +23,4 @@ taskset -c 0 $FFT_BENCH_PATH/mkl_bench --benchmark_out=mkl-skylake.json --benchm
 taskset -c 0 $FFT_BENCH_PATH/fftw3_bench --benchmark_out=fftw3-skylake.json --benchmark_out_format=json --benchmark_time_unit=us
 taskset -c 0 $FFT_BENCH_PATH/pocket_bench --benchmark_out=pocket-skylake.json --benchmark_out_format=json --benchmark_time_unit=us
 taskset -c 0 $FFT_BENCH_PATH/kiss_bench --benchmark_out=kiss-skylake.json --benchmark_out_format=json --benchmark_time_unit=us
-taskset -c 0 $FFT_BENCH_PATH/ducc_bench --benchmark_out=ducc-icelake.json --benchmark_out_format=json --benchmark_time_unit=us
+taskset -c 0 $FFT_BENCH_PATH/ducc_bench --benchmark_out=ducc-skylake.json --benchmark_out_format=json --benchmark_time_unit=us
