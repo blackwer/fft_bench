@@ -7,3 +7,6 @@
 [submodule "extern/benchmark"]
 	path = extern/benchmark
 	url = https://github.com/google/benchmark
+[submodule "ducc0"]
+	path = extern/ducc0
+	url = https://gitlab.mpcdf.mpg.de/mtr/ducc.git

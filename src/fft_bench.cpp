@@ -20,6 +20,11 @@ extern "C" {
 #elif FFT_BENCH_KISS
 #include <kiss_fft.h>
 #define FFTW_MEASURE 0
+#elif FFT_BENCH_DUCC
+#include <ducc0/fft/fft.h>
+// ugly hack, but it makes compilation easier
+#include <ducc0/infra/threading.cc>
+#define FFTW_MEASURE 0
 #endif
 
 void initialize_arrays(int N, double *in, double *out) {
@@ -89,6 +94,30 @@ static void run_fft(benchmark::State &state) {
 
     kiss_fft_free(p);
 }
+#elif defined(FFT_BENCH_DUCC)
+template <int N_per_dim, int dim >
+static void run_fft(benchmark::State &state) {
+    constexpr int N = std::pow(N_per_dim, dim);
+    ducc0::fmav_info::shape_t shape, axes;
+    
+    for (size_t i=0; i<dim; ++i) {
+      shape.push_back(N_per_dim);
+      axes.push_back(i);
+    }
+    std::vector<std::complex<double>> vin(N), vout(N);
+    initialize_arrays(N, (double *)vin.data(), (double *)vout.data());
+    ducc0::cfmav<std::complex<double>> in(vin.data(),shape);
+    ducc0::vfmav<std::complex<double>> out(vout.data(),shape);
+
+#ifdef FFT_BENCH_OMP
+    size_t n_threads = omp_get_max_threads();
+#else
+    size_t n_threads = 1;
+#endif
+
+    for (auto _ : state)
+        ducc0::c2c(in,out,axes,true,1.,n_threads);
+}
 #endif
 
 BENCHMARK(run_fft<1 << 8, 1>);
@@ -110,7 +139,7 @@ BENCHMARK(run_fft<1 << 23, 1>);
 BENCHMARK(run_fft<1 << 24, 1>);
 BENCHMARK(run_fft<1 << 25, 1>);
 
-#if defined(FFT_BENCH_MKL) | defined(FFT_BENCH_FFTW3)
+#if defined(FFT_BENCH_MKL) | defined(FFT_BENCH_FFTW3) | defined(FFT_BENCH_DUCC)
 BENCHMARK(run_fft<1 << 4, 2>);
 BENCHMARK(run_fft<1 << 5, 2>);
 BENCHMARK(run_fft<1 << 6, 2>);
