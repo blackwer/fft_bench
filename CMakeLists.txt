@@ -44,6 +44,11 @@ target_include_directories(mkl_omp_bench PRIVATE ${FFT_BENCH_INCLUDES} ${FFTW3_I
 target_link_libraries(mkl_omp_bench mkl_rt OpenMP::OpenMP_CXX benchmark::benchmark)
 target_compile_options(mkl_omp_bench PRIVATE -march=native -DFFT_BENCH_MKL -DFFT_BENCH_OMP)
 
+add_executable(ducc_omp_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
+target_include_directories(ducc_omp_bench PRIVATE ${FFT_BENCH_INCLUDES} ${PROJECT_SOURCE_DIR}/extern/ducc0/src)
+target_link_libraries(ducc_omp_bench OpenMP::OpenMP_CXX benchmark::benchmark)
+target_compile_options(ducc_omp_bench PRIVATE -march=native -DFFT_BENCH_DUCC -DFFT_BENCH_OMP)
+
 add_executable(fftw3_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
 target_include_directories(fftw3_bench PRIVATE ${FFT_BENCH_INCLUDES} ${FFTW3_INCLUDE_DIRS})
 target_link_libraries(fftw3_bench ${FFTW3_LIBRARIES} benchmark::benchmark)

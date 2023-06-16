@@ -39,7 +39,7 @@ void initialize_arrays(int N, double *in, double *out) {
 }
 
 #if defined(FFT_BENCH_MKL) | defined(FFT_BENCH_FFTW3)
-template <int N_per_dim, int dim >
+template <int N_per_dim, int dim>
 static void run_fft(benchmark::State &state) {
     constexpr int N = std::pow(N_per_dim, dim);
     fftw_complex *in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * N);
@@ -67,7 +67,7 @@ static void run_fft(benchmark::State &state) {
 }
 
 #elif defined(FFT_BENCH_POCKET)
-template <int N, int dim >
+template <int N, int dim>
 static void run_fft(benchmark::State &state) {
     static_assert(dim == 1, "Multiple dimensions not implemented for pocket");
     double *in = (double *)malloc(2 * sizeof(double) * N);
@@ -95,19 +95,19 @@ static void run_fft(benchmark::State &state) {
     kiss_fft_free(p);
 }
 #elif defined(FFT_BENCH_DUCC)
-template <int N_per_dim, int dim >
+template <int N_per_dim, int dim>
 static void run_fft(benchmark::State &state) {
     constexpr int N = std::pow(N_per_dim, dim);
     ducc0::fmav_info::shape_t shape, axes;
-    
-    for (size_t i=0; i<dim; ++i) {
-      shape.push_back(N_per_dim);
-      axes.push_back(i);
+
+    for (size_t i = 0; i < dim; ++i) {
+        shape.push_back(N_per_dim);
+        axes.push_back(i);
     }
     std::vector<std::complex<double>> vin(N), vout(N);
     initialize_arrays(N, (double *)vin.data(), (double *)vout.data());
-    ducc0::cfmav<std::complex<double>> in(vin.data(),shape);
-    ducc0::vfmav<std::complex<double>> out(vout.data(),shape);
+    ducc0::cfmav<std::complex<double>> in(vin.data(), shape);
+    ducc0::vfmav<std::complex<double>> out(vout.data(), shape);
 
 #ifdef FFT_BENCH_OMP
     size_t n_threads = omp_get_max_threads();
@@ -116,7 +116,7 @@ static void run_fft(benchmark::State &state) {
 #endif
 
     for (auto _ : state)
-        ducc0::c2c(in,out,axes,true,1.,n_threads);
+        ducc0::c2c(in, out, axes, true, 1., n_threads);
 }
 #endif
 
