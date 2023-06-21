@@ -16,7 +16,7 @@ mainfont = {
 }
 
 arches = ['rome', 'skylake', 'icelake']
-implementations = ['mkl', 'fftw3', 'mkl-omp', 'fftw3-omp', 'pocket', 'kiss']
+implementations = ['mkl', 'fftw3', 'mkl-omp', 'fftw3-omp', 'pocket', 'kiss', 'ducc', 'ducc-omp']
 
 cpu_data = {
     'rome': 'AMD EPYC 7742',
