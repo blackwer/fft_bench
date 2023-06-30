@@ -22,6 +22,7 @@ extern "C" {
 #define FFTW_MEASURE 0
 #elif FFT_BENCH_DUCC
 #include <ducc0/fft/fft.h>
+#include <ducc0/infra/aligned_array.h>
 // ugly hack, but it makes compilation easier
 #include <ducc0/infra/threading.cc>
 #define FFTW_MEASURE 0
@@ -104,7 +105,7 @@ static void run_fft(benchmark::State &state) {
         shape.push_back(N_per_dim);
         axes.push_back(i);
     }
-    std::vector<std::complex<double>> vin(N), vout(N);
+    ducc0::aligned_array<std::complex<double>> vin(N), vout(N);
     initialize_arrays(N, (double *)vin.data(), (double *)vout.data());
     ducc0::cfmav<std::complex<double>> in(vin.data(), shape);
     ducc0::vfmav<std::complex<double>> out(vout.data(), shape);
