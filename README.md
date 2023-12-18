@@ -5,12 +5,11 @@ FFTW3 run in FFTW_MEASURE mode. FFTW_PATIENT is death, and I wanted to give it a
     --enable-avx2 --enable-avx512 --disable-kcvi --disable-vsx \
     --disable-avx-128-fma --enable-fma
 ```
-using `gcc 12.2.0`. All benchmarks are compiled with native instructions enabled: `-march=native -O3`
+using `gcc 12.2.0`. All benchmarks are compiled with native instructions enabled: `-march=native -O3`.
 
-| MKL      | FFTW   | KISS    | Pocket   | DUCC    |
-|----------|--------|---------|----------|---------|
-| 2023.0.0 | 3.3.10 | 131.1.0 | 81d171a6 | f7ddfda |
-
+| MKL      | FFTW   | KISS    | Pocket   | DUCC   | Sleef |
+|----------|--------|---------|----------|--------|-------|
+| 2023.1.0 | 3.3.10 | 131.1.0 | 81d171a6 | 0.32.0 | 3.5.1 |
 
 
 ## Single threaded results

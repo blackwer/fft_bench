@@ -16,7 +16,7 @@ mainfont = {
 }
 
 arches = ['rome', 'skylake', 'icelake']
-implementations = ['mkl', 'fftw3', 'mkl-omp', 'fftw3-omp', 'pocket', 'kiss', 'ducc', 'ducc-omp']
+implementations = ['mkl', 'fftw3', 'mkl-omp', 'fftw3-omp', 'pocket', 'kiss', 'ducc', 'ducc-omp', 'sleef', 'sleef-omp']
 
 cpu_data = {
     'rome': 'AMD EPYC 7742',
@@ -54,6 +54,7 @@ def plot_st_dim(dim: int):
             sizes, _, timings = params
             if len(sizes):
                 plt.loglog(sizes, timings, label=impl, linewidth=3)
+
         plt.title(f"{dim}D C2C on {cpu_data[arch]} (single-threaded)", fontdict=mainfont)
         plt.xlabel("FFT size", fontdict=mainfont)
         plt.ylabel("Time (µs)", fontdict=mainfont)

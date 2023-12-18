@@ -18,9 +18,12 @@ export OMP_PLACES=threads
 taskset -c 0-63 $FFT_BENCH_PATH/mkl_omp_bench --benchmark_out=mkl-omp-rome.json --benchmark_out_format=json --benchmark_time_unit=us
 taskset -c 0-63 $FFT_BENCH_PATH/fftw3_omp_bench --benchmark_out=fftw3-omp-rome.json --benchmark_out_format=json --benchmark_time_unit=us
 OMP_PROC_BIND= OMP_PLACES= OMP_WAIT_POLICY=passive taskset -c 0-63 $FFT_BENCH_PATH/ducc_omp_bench --benchmark_out=ducc-omp-rome.json --benchmark_out_format=json --benchmark_time_unit=us
+taskset -c 0-63 $FFT_BENCH_PATH/sleef_bench --benchmark_out=sleef-omp-rome.json --benchmark_out_format=json --benchmark_time_unit=us
 
+export OMP_NUM_THREADS=1
 taskset -c 0 $FFT_BENCH_PATH/mkl_bench --benchmark_out=mkl-rome.json --benchmark_out_format=json --benchmark_time_unit=us
 taskset -c 0 $FFT_BENCH_PATH/fftw3_bench --benchmark_out=fftw3-rome.json --benchmark_out_format=json --benchmark_time_unit=us
 taskset -c 0 $FFT_BENCH_PATH/pocket_bench --benchmark_out=pocket-rome.json --benchmark_out_format=json --benchmark_time_unit=us
 taskset -c 0 $FFT_BENCH_PATH/kiss_bench --benchmark_out=kiss-rome.json --benchmark_out_format=json --benchmark_time_unit=us
 taskset -c 0 $FFT_BENCH_PATH/ducc_bench --benchmark_out=ducc-rome.json --benchmark_out_format=json --benchmark_time_unit=us
+taskset -c 0 $FFT_BENCH_PATH/sleef_bench --benchmark_out=sleef-rome.json --benchmark_out_format=json --benchmark_time_unit=us
