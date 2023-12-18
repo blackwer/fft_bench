@@ -12,6 +12,11 @@
 #include <fftw/fftw3_mkl.h>
 #elif FFT_BENCH_FFTW3
 #include <fftw3.h>
+#elif FFT_BENCH_SLEEF
+extern "C" {
+#include <sleef.h>
+#include <sleefdft.h>
+}
 #elif FFT_BENCH_POCKET
 extern "C" {
 #include <pocketfft.h>
@@ -22,6 +27,7 @@ extern "C" {
 #define FFTW_MEASURE 0
 #elif FFT_BENCH_DUCC
 #include <ducc0/fft/fft.h>
+#include <ducc0/fft/fftnd_impl.h>
 // ugly hack, but it makes compilation easier
 #include <ducc0/infra/threading.cc>
 #define FFTW_MEASURE 0
@@ -41,7 +47,7 @@ void initialize_arrays(int N, double *in, double *out) {
 #if defined(FFT_BENCH_MKL) | defined(FFT_BENCH_FFTW3)
 template <int N_per_dim, int dim>
 static void run_fft(benchmark::State &state) {
-    constexpr int N = std::pow(N_per_dim, dim);
+    const int N = std::pow(N_per_dim, dim);
     fftw_complex *in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * N);
     fftw_complex *out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * N);
     initialize_arrays(N, (double *)in, (double *)out);
@@ -64,6 +70,28 @@ static void run_fft(benchmark::State &state) {
     fftw_destroy_plan(p);
     fftw_free(in);
     fftw_free(out);
+}
+#elif defined(FFT_BENCH_SLEEF)
+template <int N_per_dim, int dim>
+static void run_fft(benchmark::State &state) {
+    const int N = std::pow(N_per_dim, dim);
+    double *in = (double *)Sleef_malloc(2 * N * sizeof(double));
+    double *out = (double *)Sleef_malloc(2 * N * sizeof(double));
+    initialize_arrays(N, (double *)in, (double *)out);
+    SleefDFT_setPlanFilePath("plan.txt", NULL, SLEEF_PLAN_AUTOMATIC);
+
+    struct SleefDFT *p;
+    if constexpr (dim == 1)
+        p = SleefDFT_double_init1d(N_per_dim, in, out, SLEEF_MODE_FORWARD);
+    else if constexpr (dim == 2)
+        p = SleefDFT_double_init2d(N_per_dim, N_per_dim, in, out, SLEEF_MODE_FORWARD);
+
+    for (auto _ : state)
+        SleefDFT_double_execute(p, NULL, NULL);
+
+    Sleef_free(in);
+    Sleef_free(out);
+    SleefDFT_dispose(p);
 }
 
 #elif defined(FFT_BENCH_POCKET)
@@ -139,7 +167,7 @@ BENCHMARK(run_fft<1 << 23, 1>);
 BENCHMARK(run_fft<1 << 24, 1>);
 BENCHMARK(run_fft<1 << 25, 1>);
 
-#if defined(FFT_BENCH_MKL) | defined(FFT_BENCH_FFTW3) | defined(FFT_BENCH_DUCC)
+#if defined(FFT_BENCH_MKL) | defined(FFT_BENCH_FFTW3) | defined(FFT_BENCH_DUCC) | defined(FFT_BENCH_SLEEF)
 BENCHMARK(run_fft<1 << 4, 2>);
 BENCHMARK(run_fft<1 << 5, 2>);
 BENCHMARK(run_fft<1 << 6, 2>);
@@ -151,6 +179,7 @@ BENCHMARK(run_fft<1 << 11, 2>);
 BENCHMARK(run_fft<1 << 12, 2>);
 BENCHMARK(run_fft<1 << 13, 2>);
 
+#if not defined(FFT_BENCH_SLEEF)
 BENCHMARK(run_fft<1 << 2, 3>);
 BENCHMARK(run_fft<1 << 3, 3>);
 BENCHMARK(run_fft<1 << 5, 3>);
@@ -158,6 +187,7 @@ BENCHMARK(run_fft<1 << 6, 3>);
 BENCHMARK(run_fft<1 << 7, 3>);
 BENCHMARK(run_fft<1 << 8, 3>);
 BENCHMARK(run_fft<1 << 9, 3>);
+#endif
 #endif
 
 BENCHMARK_MAIN();

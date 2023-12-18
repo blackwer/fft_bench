@@ -24,6 +24,12 @@ find_package(MKL REQUIRED)
 find_package(OpenMP REQUIRED)
 pkg_check_modules(FFTW3 REQUIRED fftw3)
 
+include(ExternalProject)
+ExternalProject_Add(libsleef
+  SOURCE_DIR ${PROJECT_SOURCE_DIR}/extern/sleef
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/contrib -DBUILD_DFT=TRUE -DSLEEFDFT_MAXBUTWIDTH=7
+)
+
 add_subdirectory(${PROJECT_SOURCE_DIR}/extern/benchmark)
 
 set(KISSFFT_STATIC ON CACHE STRING "" FORCE)
@@ -33,6 +39,12 @@ set(KISSFFT_TEST OFF CACHE STRING "" FORCE)
 set(KISSFFT_DATATYPE double CACHE STRING "" FORCE)
 add_subdirectory(${PROJECT_SOURCE_DIR}/extern/kissfft)
 
+add_executable(sleef_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
+add_dependencies(sleef_bench libsleef)
+target_include_directories(sleef_bench PRIVATE ${FFT_BENCH_INCLUDES} ${CMAKE_BINARY_DIR}/contrib/include)
+target_link_directories(sleef_bench PRIVATE ${CMAKE_BINARY_DIR}/contrib/lib64)
+target_link_libraries(sleef_bench benchmark::benchmark sleef sleefdft)
+target_compile_options(sleef_bench PRIVATE -march=native -DFFT_BENCH_SLEEF)
 
 add_executable(mkl_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
 target_include_directories(mkl_bench PRIVATE ${FFT_BENCH_INCLUDES} ${MKL_H})
