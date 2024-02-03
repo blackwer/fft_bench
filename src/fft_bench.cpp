@@ -29,7 +29,9 @@ extern "C" {
 #include <ducc0/fft/fft.h>
 #include <ducc0/fft/fftnd_impl.h>
 // ugly hack, but it makes compilation easier
+#include <ducc0/infra/mav.cc>
 #include <ducc0/infra/threading.cc>
+#include <ducc0/infra/string_utils.cc>
 #define FFTW_MEASURE 0
 #endif
 
@@ -138,7 +140,7 @@ static void run_fft(benchmark::State &state) {
     ducc0::vfmav<std::complex<double>> out(vout.data(), shape);
 
 #ifdef FFT_BENCH_OMP
-    size_t n_threads = omp_get_max_threads();
+    size_t n_threads = ducc0::max_threads();
 #else
     size_t n_threads = 1;
 #endif
