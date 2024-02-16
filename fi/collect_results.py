@@ -55,12 +55,12 @@ def plot_st_dim(dim: int):
             sizes, _, timings = params
             if len(sizes):
                 sizes = [size ** dim for size in sizes]
-                timings = [dt / size / dim for dt, size in zip(timings, sizes)]
+                timings = [1000 * dt / size / dim for dt, size in zip(timings, sizes)]
                 plt.loglog(sizes, timings, label=impl, linewidth=3)
 
         plt.title(f"{dim}D C2C on {cpu_data[arch]} (single-threaded)", fontdict=mainfont)
         plt.xlabel("Gridpoints", fontdict=mainfont)
-        plt.ylabel("Time (µs)", fontdict=mainfont)
+        plt.ylabel("Time per gridpoint (ns)", fontdict=mainfont)
         ax.tick_params(labelsize=14, width=2)
 
         plt.legend(prop={'size':18})
@@ -78,11 +78,11 @@ def plot_mt_dim(dim: int):
             sizes, _, timings = params
             if len(sizes):
                 sizes = [size ** dim for size in sizes]
-                timings = [dt / size / dim for dt, size in zip(timings, sizes)]
+                timings = [1000 * dt / size / dim for dt, size in zip(timings, sizes)]
                 plt.loglog(sizes, timings, label=impl, linewidth=3)
         plt.title(f"{dim}D C2C on {cpu_data[arch]} (multi-threaded)", fontdict=mainfont)
         plt.xlabel("Gridpoints", fontdict=mainfont)
-        plt.ylabel("Time (µs)", fontdict=mainfont)
+        plt.ylabel("Time per gridpoint (ns)", fontdict=mainfont)
         ax.tick_params(labelsize=14, width=2)
 
         plt.legend(prop={'size':18})
