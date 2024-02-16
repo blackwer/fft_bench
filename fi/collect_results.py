@@ -15,7 +15,8 @@ mainfont = {
     'size': 18,
 }
 
-arches = ['rome', 'skylake', 'icelake']
+arches = ['rome', 'skylake', # 'icelake'
+          ]
 implementations = ['mkl', 'fftw3', 'mkl-omp', 'fftw3-omp', 'pocket', 'kiss', 'ducc', 'ducc-omp', 'sleef', 'sleef-omp']
 
 cpu_data = {
@@ -53,10 +54,12 @@ def plot_st_dim(dim: int):
                 continue
             sizes, _, timings = params
             if len(sizes):
+                sizes = [size ** dim for size in sizes]
+                timings = [dt / size / dim for dt, size in zip(timings, sizes)]
                 plt.loglog(sizes, timings, label=impl, linewidth=3)
 
         plt.title(f"{dim}D C2C on {cpu_data[arch]} (single-threaded)", fontdict=mainfont)
-        plt.xlabel("FFT size", fontdict=mainfont)
+        plt.xlabel("Gridpoints", fontdict=mainfont)
         plt.ylabel("Time (µs)", fontdict=mainfont)
         ax.tick_params(labelsize=14, width=2)
 
@@ -74,9 +77,11 @@ def plot_mt_dim(dim: int):
                 continue
             sizes, _, timings = params
             if len(sizes):
+                sizes = [size ** dim for size in sizes]
+                timings = [dt / size / dim for dt, size in zip(timings, sizes)]
                 plt.loglog(sizes, timings, label=impl, linewidth=3)
         plt.title(f"{dim}D C2C on {cpu_data[arch]} (multi-threaded)", fontdict=mainfont)
-        plt.xlabel("FFT size", fontdict=mainfont)
+        plt.xlabel("Gridpoints", fontdict=mainfont)
         plt.ylabel("Time (µs)", fontdict=mainfont)
         ax.tick_params(labelsize=14, width=2)
 
