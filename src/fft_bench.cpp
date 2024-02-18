@@ -5,7 +5,7 @@
 #include <benchmark/benchmark.h>
 
 #ifdef FFT_BENCH_OMP
-#ifndef FFT_BENCH_DUCC  // we don't need OpenMP for ducc
+#ifndef FFT_BENCH_DUCC  // we don't need OpenMP for ducc, but ducc respects OMP_NUM_THREADS
 #include <omp.h>
 #endif
 #endif

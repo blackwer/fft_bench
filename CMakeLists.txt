@@ -3,7 +3,7 @@ project(
   fft_bench
   LANGUAGES C CXX
 )
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 set (default_build_type "Release")
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -85,3 +85,13 @@ add_executable(ducc_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
 target_include_directories(ducc_bench PRIVATE ${FFT_BENCH_INCLUDES} ${PROJECT_SOURCE_DIR}/extern/ducc0/src)
 target_link_libraries(ducc_bench benchmark::benchmark)
 target_compile_options(ducc_bench PRIVATE -O3 -march=native -ffast-math -DFFT_BENCH_DUCC -DDUCC0_NO_LOWLEVEL_THREADING)
+
+add_executable(duccnew_omp_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
+target_include_directories(duccnew_omp_bench PRIVATE ${FFT_BENCH_INCLUDES} ${PROJECT_SOURCE_DIR}/extern/ducc0new/src)
+target_link_libraries(duccnew_omp_bench benchmark::benchmark)
+target_compile_options(duccnew_omp_bench PRIVATE -O3 -march=native -ffast-math -DFFT_BENCH_DUCC -DFFT_BENCH_OMP -pthread)
+
+add_executable(duccnew_bench ${PROJECT_SOURCE_DIR}/src/fft_bench.cpp)
+target_include_directories(duccnew_bench PRIVATE ${FFT_BENCH_INCLUDES} ${PROJECT_SOURCE_DIR}/extern/ducc0new/src)
+target_link_libraries(duccnew_bench benchmark::benchmark)
+target_compile_options(duccnew_bench PRIVATE -O3 -march=native -ffast-math -DFFT_BENCH_DUCC -DDUCC0_NO_LOWLEVEL_THREADING)
