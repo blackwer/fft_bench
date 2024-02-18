@@ -5,7 +5,9 @@
 #include <benchmark/benchmark.h>
 
 #ifdef FFT_BENCH_OMP
+#ifndef FFT_BENCH_DUCC  // we don't need OpenMP for ducc, but ducc respects OMP_NUM_THREADS
 #include <omp.h>
+#endif
 #endif
 
 #ifdef FFT_BENCH_MKL
@@ -32,7 +34,6 @@ extern "C" {
 #include <ducc0/infra/mav.cc>
 #include <ducc0/infra/threading.cc>
 #include <ducc0/infra/string_utils.cc>
-#define FFTW_MEASURE 0
 #endif
 
 void initialize_arrays(int N, double *in, double *out) {
@@ -184,6 +185,7 @@ BENCHMARK(run_fft<1 << 13, 2>);
 #if not defined(FFT_BENCH_SLEEF)
 BENCHMARK(run_fft<1 << 2, 3>);
 BENCHMARK(run_fft<1 << 3, 3>);
+BENCHMARK(run_fft<1 << 4, 3>);
 BENCHMARK(run_fft<1 << 5, 3>);
 BENCHMARK(run_fft<1 << 6, 3>);
 BENCHMARK(run_fft<1 << 7, 3>);
