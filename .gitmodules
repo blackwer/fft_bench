@@ -13,3 +13,6 @@
 [submodule "extern/sleef"]
 	path = extern/sleef
 	url = https://github.com/shibatch/sleef
+[submodule "extern/ducc0new"]
+	path = extern/ducc0new
+	url = https://gitlab.mpcdf.mpg.de/mtr/ducc.git
